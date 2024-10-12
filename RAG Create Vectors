@@ -1,0 +1,55 @@
+from bs4 import BeautifulSoup
+import openai
+import json
+
+text = parse_html_file(./maths.html')
+embedding = create_embeddings(os.getenv(“API_KEY”), )
+insert_into_vector_table('your_vector_key', 'your_text')
+
+def parse_html_file(file_path):
+    with open(file_path, 'r') as html_file:
+        soup = BeautifulSoup(html_file, 'html.parser')
+        return str(soup)
+
+def create_embeddings(api_key, model, text):
+    openai.api_key = api_key
+
+    try:
+        embedding_response = openai.Embedding.create(
+            input=text,
+            model=model
+        )
+        embedding = json.dumps(embedding_response['data'][0]['embedding'])
+        return embedding
+
+    except Exception as err:
+        print(f"Failed creating embedding for content: {text} ", err)
+        raise err
+
+
+def insert_into_vector_table(vector_key, text):
+    try:
+        # Connect to your postgres DB
+        conn = psycopg2.connect(
+            dbname="your_database_name",
+            user="your_username",
+            password="your_password",
+            host="localhost",
+            port="5432"
+        )
+
+        # Open a cursor to perform database operations
+        cur = conn.cursor()
+
+        # Execute a query
+        cur.execute("INSERT INTO vector (vector_key, text) VALUES (%s, %s)", (vector_key, text))
+
+        # Commit the transaction
+        conn.commit()
+
+        # Close the cursor and connection
+        cur.close()
+        conn.close()
+
+    except Exception as e:
+        print("Unable to access database, error occurred:", e)
